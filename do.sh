@@ -1,2 +1,2 @@
-# mv $1 /home/marrinus/dotfiles/
-ln -s /home/marrinus/dotfiles/ $1
+mv $1 ~/dotfiles/
+ln -s ~/dotfiles/ $1
