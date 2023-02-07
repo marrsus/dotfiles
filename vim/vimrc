@@ -1,0 +1,30 @@
+" kill vi
+set nocompatible
+
+" force pulg-ins to act better
+filetype off
+filetype plugin indent on
+"highlighting
+syntax on
+
+" wraping
+set wrap
+
+" Status bar
+set laststatus=2
+
+" line numbers
+set number
+
+" spell-checking
+set spell
+
+" show brackt pairs
+set showmatch
+
+" indentation
+set shiftwidth=4
+set softtabstop=4
+
+" fix backspace
+set backspace=indent,eol,start
