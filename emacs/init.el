@@ -21,18 +21,15 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 
-(set-frame-parameter (selected-frame) 'alpha '(90 . 90))
-(add-to-list 'default-frame-alist '(alpha . (90 . 90)))
-(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (load custom-file 'noerror 'nomessage)
 
 (setq use-dialog-box nil)
 
 (global-auto-revert-mode 1)
-
+(use-package autothemer)
+(set-face-attribute 'default (selected-frame) :height 100)
+(load-theme 'wombat)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -47,6 +44,7 @@
   (setq which-key-idle-delay 1))
 
 
+
 (use-package general
   :config
   (general-create-definer rune/leader-keys
@@ -56,10 +54,11 @@
 
   (rune/leader-keys
     "w"  '(:ignore t :which-key "frame")
-    "wh" '(split-window-right :which-key "new frame horizontally")
-    "ww" '(split-window-right :which-key "new frame horizontally")
-    "wv" '(split-window-below :which-key "new frame vertically")
-    "wd" '(delete-window :which-key "close frame")
+    "wh" '(split-window-right :which-key "new window horizontally")
+    "ww" '(split-window-right :which-key "new window horizontally")
+    "wv" '(split-window-below :which-key "new window vertically")
+    "wd" '(delete-window :which-key "close window")
+    "w TAB" '(other-window :which-key "go to another window")
     "b"  '(:ignore t :which-key buffers)
     "bl" '(buffer-list :which-key "list buffers")
     "bb" '(switch-to-buffer :which-key "swith buffer")
@@ -84,7 +83,11 @@
 
 
   (use-package yasnippet)
-  (yas-global-mode 1)
+(yas-global-mode 1)
+
+(define-derived-mode biotech-mode latex-mode "biotech" "Major mode for biotech assignments")
+(define-derived-mode math-assignment-mode latex-mode "math-assignment" "Major mode for math assignments")
+
 
 (use-package all-the-icons)
 
@@ -120,6 +123,7 @@
   :ensure t
   :config
   (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
 ;; Set the title
 (setq dashboard-banner-logo-title "the only text editor that is the center of a hole religion")
@@ -186,17 +190,14 @@
 
 ;latex
 ;cargo install --locked --git https://github.com/latex-lsp/texlab.git
-(setq tex-compile-commands '("xelatex" "sage"))
-(setq tex-main-file "main.tex")
 ;; "texlab" must be located at a directory contained in `exec-path'.
 ;; If you want to put "texlab" somewhere else,
 ;; you can specify the path to "texlab" as follows:
 ;; (setq lsp-latex-texlab-executable "/path/to/texlab")
 
 (with-eval-after-load "tex-mode"
- (add-hook 'tex-mode-hook 'lsp)
- (add-hook 'latex-mode-hook 'lsp))
-(setq lsp-latex-build-executable "xelatex")
+(setq tex-compile-command 'xelatex)
+  )
 
 ;bash
 ;lsp-install-server <ret> bash-ls
