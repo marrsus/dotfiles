@@ -19,6 +19,7 @@
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(menu-bar-mode -1)
 
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (load custom-file 'noerror 'nomessage)
@@ -26,7 +27,9 @@
 (setq use-dialog-box nil)
 
 (global-auto-revert-mode 1)
-
+(use-package autothemer)
+(set-face-attribute 'default (selected-frame) :height 100)
+(load-theme 'wombat)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -40,6 +43,8 @@
   :config
   (setq which-key-idle-delay 1))
 
+
+
 (use-package general
   :config
   (general-create-definer rune/leader-keys
@@ -48,15 +53,41 @@
     :global-prefix "C-SPC")
 
   (rune/leader-keys
-    "d"  '(:ignore t :which-key "close stuff")
-    "dd" '(delete-window :which-key "close frame")
-    "db" '(kill-buffer)
-    "n"  '(:ignore t :which-key "make new")
-    "nf" '(make-empty-file :which-key "new file")
-    "nv" '(split-window-below :which-key "new frame vertically")
-    "nh" '(split-window-right :which-key "new frame horizontally")
+    "w"  '(:ignore t :which-key "frame")
+    "wh" '(split-window-right :which-key "new window horizontally")
+    "ww" '(split-window-right :which-key "new window horizontally")
+    "wv" '(split-window-below :which-key "new window vertically")
+    "wd" '(delete-window :which-key "close window")
+    "w TAB" '(other-window :which-key "go to another window")
+    "b"  '(:ignore t :which-key buffers)
+    "bl" '(buffer-list :which-key "list buffers")
+    "bb" '(switch-to-buffer :which-key "swith buffer")
+    "bd" '(kill-buffer :which-key "close buffer")
+    "f"  '(:ignore t :which-key "files") 
+    "ff" '(find-file :which-key "open new file")
+    "fn" '(make-empty-file :which-key "new file")
+    "fm" '(dired :which-key "dired")
+    "l"  '(:ignore t :which-key "lisp")
+    "ll" '(eval-buffer :which-key "eval buffer")
+    "r"  '(:ignore t :which-key "rust")
+    "rr" '(rust-run :which-key "run")
+    "rb" '(rust-compile :which-key "build")
+    "rt" '(rust-test :which-key "test")
+    "t"  '(:ignore t :which-key "tex")
+    "tt" '(tex-compile :which-key "compile")
+    "y"  '(:ignore t :which-key "snippets")
+    "yy" '(yas-describe-tables :which-key "½snippits list" )
     ))
 (use-package flyspell)
+(flyspell-mode 1)
+
+
+  (use-package yasnippet)
+(yas-global-mode 1)
+
+(define-derived-mode biotech-mode latex-mode "biotech" "Major mode for biotech assignments")
+(define-derived-mode math-assignment-mode latex-mode "math-assignment" "Major mode for math assignments")
+
 
 (use-package all-the-icons)
 
@@ -73,16 +104,13 @@
   (setq evil-want-C-i-jump nil)
   :config
   (evil-mode 1)
-  (define-key evil-normal-state-map (kbd "C-o") 'find-file)
   (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
   (define-key evil-normal-state-map (kbd "C-v") 'clipboard-yank)
-  (define-key evil-insert-state-map (kbd "C-o") 'find-file)
-  (define-key evil-insert-state-map (kbd "C-s") 'save-buffer)
-  (define-key evil-insert-state-map (kbd "C-v") 'clipboard-yank))
- ; (define-key evil-normal-state-map (kbd "C-c") 'copy)
+  (define-key evil-normal-state-map (kbd "C-c") 'copy)
 
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (global-set-key (kbd "C-f") 'i-search)
+  (define-key evil-insert-state-map (kbd "C-s") 'save-buffer)
+  (define-key evil-insert-state-map (kbd "C-v") 'clipboard-yank)
+  (define-key evil-insert-state-map (kbd "C-c") 'copy))
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal)
@@ -95,6 +123,7 @@
   :ensure t
   :config
   (dashboard-setup-startup-hook))
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 
 ;; Set the title
 (setq dashboard-banner-logo-title "the only text editor that is the center of a hole religion")
@@ -119,31 +148,14 @@
 (dolist (list'((comint-mode . normal)
                (help-mode . emacs)
                (grep-mode . emacs)
-               (dired-mode . emacs)))
-  (evil-set-initial-state (car list) (cdr list)))
+               (dired-mode . emacs))
+  (evil-set-initial-state (car list) (cdr list))))
 
 
-  (defun efs/lsp-mode-setup ()
-    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-    (lsp-headerline-breadcrumb-mode))
-
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook (lsp-mode . efs/lsp-mode-setup)
-    :init
-    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-    :config
-    (lsp-enable-which-key-integration t))
-
- 
-;; optionally
-  (use-package lsp-ui
-    :hook (lsp-mode . lsp-ui-mode)
-    :custom
-    (lsp-ui-doc-position 'bottom))
-;; optionally if you want to use debugger
-(use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+;(add-hook buffer-list(lambda () (evil-emacs-state-p 1)))
+(setq ido-enable-flex-matching t)
+(setq ido-everywhere t)
+(ido-mode 1) 
 
 
   (use-package company
@@ -167,8 +179,7 @@
 
 
 ;python
-(use-package lsp-jedi
-  :ensure t)
+
 
 
 (add-to-list 'exec-path "/home/marrinus/.local/bin")
@@ -178,18 +189,15 @@
 ;cargo install openscad-lsp
 
 ;latex
-					;cargo install --locked --git https://github.com/latex-lsp/texlab.git
-(use-package lsp-latex)
-(setq tex-command "platex --synctex=1")
+;cargo install --locked --git https://github.com/latex-lsp/texlab.git
 ;; "texlab" must be located at a directory contained in `exec-path'.
 ;; If you want to put "texlab" somewhere else,
 ;; you can specify the path to "texlab" as follows:
 ;; (setq lsp-latex-texlab-executable "/path/to/texlab")
 
 (with-eval-after-load "tex-mode"
- (add-hook 'tex-mode-hook 'lsp)
- (add-hook 'latex-mode-hook 'lsp))
-(setq lsp-latex-build-executable "xelatex")
+(setq tex-compile-command 'xelatex)
+  )
 
 ;bash
 ;lsp-install-server <ret> bash-ls
